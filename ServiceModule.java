@@ -6,10 +6,8 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 
 class QueryRunner implements Runnable
 {
@@ -33,56 +31,33 @@ class QueryRunner implements Runnable
                                                                      .getOutputStream()) ;
             BufferedWriter bufferedOutput = new BufferedWriter(outputStream) ;
             PrintWriter printWriter = new PrintWriter(bufferedOutput, true) ;
-            
             String clientCommand = "" ;
             String responseQuery = "" ;
-            String queryInput = "" ;
-
-            while(true)
+            // Read client query from the socket endpoint
+            clientCommand = bufferedInput.readLine(); 
+            while( ! clientCommand.equals("#"))
             {
-                // Read client query
-                clientCommand = bufferedInput.readLine();
-                // System.out.println("Recieved data <" + clientCommand + "> from client : " 
-                //                     + socketConnection.getRemoteSocketAddress().toString());
-
-                //  Tokenize here
-                StringTokenizer tokenizer = new StringTokenizer(clientCommand);
-                queryInput = tokenizer.nextToken();
-
-                if(queryInput.equals("Finish"))
-                {
-                    String returnMsg = "Connection Terminated - client : " 
-                                        + socketConnection.getRemoteSocketAddress().toString();
-                    System.out.println(returnMsg);
-                    inputStream.close();
-                    bufferedInput.close();
-                    outputStream.close();
-                    bufferedOutput.close();
-                    printWriter.close();
-                    socketConnection.close();
-                    return;
-                }
-
-                //-------------- your DB code goes here----------------------------
-                // try
-                // {
-                //    // Thread.sleep(6000);
-                // } 
-                // catch (InterruptedException e)
-                // {
-                //     e.printStackTrace();
-                // }
-
-                responseQuery = "******* Dummy result ******";
-
-                //----------------------------------------------------------------
                 
+                System.out.println("Recieved data <" + clientCommand + "> from client : " 
+                                    + socketConnection.getRemoteSocketAddress().toString());
+
+                /*******************************************
+                         Your DB code goes here
+                ********************************************/
+                
+                // Dummy response send to client
+                responseQuery = "******* Dummy result ******";      
                 //  Sending data back to the client
-                printWriter.println(responseQuery); 
-                // System.out.println("\nSent results to client - " 
-                //                     + socketConnection.getRemoteSocketAddress().toString() );
-                
+                printWriter.println(responseQuery);
+                // Read next client query
+                clientCommand = bufferedInput.readLine(); 
             }
+            inputStream.close();
+            bufferedInput.close();
+            outputStream.close();
+            bufferedOutput.close();
+            printWriter.close();
+            socketConnection.close();
         }
         catch(IOException e)
         {
@@ -96,31 +71,34 @@ class QueryRunner implements Runnable
  */
 public class ServiceModule 
 {
-    static int serverPort = 7005;
-    static int numServerCores = 2 ;
+    // Server listens to port
+    static int serverPort = 7008;
+    // Max no of parallel requests the server can process
+    static int numServerCores = 5 ;         
     //------------ Main----------------------
     public static void main(String[] args) throws IOException 
     {    
         // Creating a thread pool
         ExecutorService executorService = Executors.newFixedThreadPool(numServerCores);
         
-        //Creating a server socket to listen for clients
-        ServerSocket serverSocket = new ServerSocket(serverPort); //need to close the port
-        Socket socketConnection = null;
-        
-        // Always-ON server
-        while(true)
-        {
-            System.out.println("Listening port : " + serverPort 
-                                + "\nWaiting for clients...");
-            socketConnection = serverSocket.accept();   // Accept a connection from a client
-            System.out.println("Accepted client :" 
-                                + socketConnection.getRemoteSocketAddress().toString() 
-                                + "\n");
-            //  Create a runnable task
-            Runnable runnableTask = new QueryRunner(socketConnection);
-            //  Submit task for execution   
-            executorService.submit(runnableTask);   
+        try (//Creating a server socket to listen for clients
+        ServerSocket serverSocket = new ServerSocket(serverPort)) {
+            Socket socketConnection = null;
+            
+            // Always-ON server
+            while(true)
+            {
+                System.out.println("Listening port : " + serverPort 
+                                    + "\nWaiting for clients...");
+                socketConnection = serverSocket.accept();   // Accept a connection from a client
+                System.out.println("Accepted client :" 
+                                    + socketConnection.getRemoteSocketAddress().toString() 
+                                    + "\n");
+                //  Create a runnable task
+                Runnable runnableTask = new QueryRunner(socketConnection);
+                //  Submit task for execution   
+                executorService.submit(runnableTask);   
+            }
         }
     }
 }
