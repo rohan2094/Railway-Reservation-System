@@ -89,7 +89,7 @@ public class ServiceModule
 
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("")
+            // connection = DriverManager.getConnection("");
         } catch (Exception e) {
             // TODO: handle exception
         }

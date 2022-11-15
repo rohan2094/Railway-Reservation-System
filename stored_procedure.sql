@@ -119,11 +119,7 @@ CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_t
                         EXECUTE insert_query ;
                         insert_query2 =  CONCAT('INSERT INTO passengers (pnr, pname) VALUES(', pnr, ',''' ,passenger_name , ''')');
                         EXECUTE insert_query2 ;
-<<<<<<< HEAD
                         return;
-=======
-                       
->>>>>>> fb69b43ab5b1870d9fb66c8e733c5f17b8f44a60
                 END LOOP;
         END LOOP;
     END;
