@@ -67,7 +67,7 @@ CREATE OR REPLACE  PROCEDURE update_availability(train_id INTEGER, dated VARCHAR
         update_attr VARCHAR;
         new_value INTEGER ;
     BEGIN
-        query_for_lock = 'LOCK TABLE trains IN ACCESS EXCLUSIVE MODE';
+        query_for_lock = 'SET ISOLATION';
         no_of_seats = 0 ;
         update_attr = CONCAT('total_', coach_type, '_seats');
         execute query_for_lock;

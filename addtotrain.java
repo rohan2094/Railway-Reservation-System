@@ -14,7 +14,7 @@ public class addtotrain {
 
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/railway", "postgres", "1234");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5433/db", "postgres", "1234");
             if (connection != null) {
                 System.out.println("connection OK");
             } else {
@@ -32,18 +32,20 @@ public class addtotrain {
             String line;
             while ((line = br.readLine()) != "#") {
 
-                System.out.print(line);
-                String[] lyn = line.split(" ");
+                // System.out.print(line);
+                // System.out.print("\n");
+                String[] lyn = line.split("\\s+");
                 // for(int i=0;i<4;i++)
                 // {
                 //     System.out.print(lyn[i]);
+                //     System.out.println("\n");
                 // }
-
+                if(lyn.length==1) break;
                 try {
 
                     PreparedStatement stmt = connection.prepareStatement("call add_train(?,?,?,?)");
                     stmt.setInt(1, Integer.parseInt(lyn[0]));
-                    stmt.setInt(2, Integer.parseInt(lyn[1]));
+                    stmt.setString(2, lyn[1]);
                     stmt.setInt(3, Integer.parseInt(lyn[2]));
                     stmt.setInt(4, Integer.parseInt(lyn[3]));
                     stmt.execute();
