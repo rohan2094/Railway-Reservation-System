@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,6 +20,7 @@ class QueryRunner implements Runnable
     {
         this.socketConnection =  clientSocket;
     }
+
 
     public void run()
     {
@@ -71,6 +74,7 @@ class QueryRunner implements Runnable
  */
 public class ServiceModule 
 {
+    private static final Connection NULL = null;
     // Server listens to port
     static int serverPort = 7008;
     // Max no of parallel requests the server can process
@@ -78,6 +82,19 @@ public class ServiceModule
     //------------ Main----------------------
     public static void main(String[] args) throws IOException 
     {    
+
+        // connecting with JDBC 
+
+        Connection connection = NULL;
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection("")
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+
         // Creating a thread pool
         ExecutorService executorService = Executors.newFixedThreadPool(numServerCores);
         
