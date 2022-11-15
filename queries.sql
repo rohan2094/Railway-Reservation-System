@@ -13,8 +13,7 @@ call check_availability(1232, '12-14-2002', 'SL', 10, 0);
 call check_availability(1232, '12-14-2002', 'SL', 240, 0);
 call check_availability(1232, '12-14-2002', 'SL', 10000, 0);
 
-call book_ticket(1232, '12-14-2002', 'AC', 'Rohan', 2, 10, 10);
-call book_ticket(1232, '12-14-2002', 'SL', 'Raghav', 2, 10, 10);
+    call book_ticket(1232, '12-14-2002', 'SL', 'Raghav', 2, 10, 10);
 call book_ticket(1232, '12-14-2002', 'AC', 'Shyam', 2, 10, 10);
 call book_ticket(1232, '12-14-2002', 'SL', 'Vijay', 2, 10, 10);
 call book_ticket(1232, '12-14-2002', 'SL', 'Rohan', 2, 10, 10);
