@@ -40,10 +40,10 @@ CREATE OR REPLACE  PROCEDURE check_availability(train_id INTEGER, dated VARCHAR,
 
         no_of_seats = 0 ;
         IF(coach_type = 'AC') THEN
-            query2_seats = CONCAT('SELECT SUM(total_ac_seats) FROM trains WHERE train_id = ', train_id ,' AND dated = ''' ,dated, '''');
+            query2_seats = CONCAT('SELECT SUM(total_ac_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
             EXECUTE query2_seats INTO  no_of_seats ;
         ELSE 
-            query2_seats = CONCAT('SELECT SUM(total_sl_seats) FROM trains WHERE train_id = ', train_id ,' AND dated = ''' ,dated, '''');
+            query2_seats = CONCAT('SELECT SUM(total_sl_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
             EXECUTE query2_seats INTO  no_of_seats ;
         END IF;
             IF(tot_passenger <= no_of_seats) THEN
@@ -56,6 +56,42 @@ CREATE OR REPLACE  PROCEDURE check_availability(train_id INTEGER, dated VARCHAR,
     END
     $$
 LANGUAGE plpgsql;
+
+CREATE OR REPLACE  PROCEDURE update_availability(train_id INTEGER, dated VARCHAR, coach_type VARCHAR, tot_passenger INT, INOUT return_val INTEGER)
+    AS $$
+    DECLARE
+        query_for_lock VARCHAR;
+        query_for_av_seats VARCHAR;
+        no_of_seats INTEGER ;
+        update_query VARCHAR;
+        update_attr VARCHAR;
+        new_value INTEGER ;
+    BEGIN
+        query_for_lock = 'LOCK TABLE trains IN ACCESS EXCLUSIVE MODE';
+        no_of_seats = 0 ;
+        update_attr = CONCAT('total_', coach_type, '_seats');
+        execute query_for_lock;
+        IF(coach_type = 'AC') THEN
+            query_for_av_seats = CONCAT('SELECT SUM(total_ac_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
+            EXECUTE query_for_av_seats INTO  no_of_seats ;
+        ELSE 
+            query_for_av_seats = CONCAT('SELECT SUM(total_sl_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
+            EXECUTE query_for_av_seats INTO  no_of_seats ;
+        END IF;
+        IF(tot_passenger <= no_of_seats) THEN
+            new_value = no_of_seats - tot_passenger;
+            update_query = CONCAT('UPDATE trains SET ', update_attr, ' = ', new_value, ' WHERE train_id = ', train_id , ' AND dated = ''', dated, '''');
+            EXECUTE update_query;
+            return_val = 1 ;
+            return;
+        ELSE
+            return_val = 0;
+            return;
+        END IF ;
+    END
+    $$
+LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_type VARCHAR, passenger_name VARCHAR, pnr INTEGER, total_ac_coach INTEGER, total_sl_coach INTEGER)
     AS
