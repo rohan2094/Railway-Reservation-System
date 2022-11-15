@@ -16,6 +16,7 @@ class sendQuery implements Runnable
     sendQuery()
     {
      // Red args if any
+        
     }   
     @Override
     public void run()
