@@ -1,12 +1,3 @@
-CREATE TABLE trains(
-    train_id INTEGER NOT NULL,
-    dated VARCHAR(10) NOT NULL,
-    total_ac_seats INTEGER NOT NULL,
-    total_sl_seats INTEGER NOT NULL,
-    total_ac_coach INTEGER NOT NULL,
-    total_sl_coach INTEGER NOT NULL
-);
-
 CREATE TABLE forac(
     berth_id INTEGER ,
     berth_type VARCHAR NOT NULL
@@ -16,6 +7,15 @@ CREATE TABLE forsl(
     berth_id INTEGER NOT NULL,
     berth_type VARCHAR NOT NULL
 );
+CREATE TABLE trains(
+    train_id INTEGER NOT NULL,
+    dated VARCHAR(10) NOT NULL,
+    total_ac_seats INTEGER NOT NULL,
+    total_sl_seats INTEGER NOT NULL,
+    total_ac_coach INTEGER NOT NULL,
+    total_sl_coach INTEGER NOT NULL
+);
+
 
 CREATE TABLE bookings(
     train_id INTEGER NOT NULL,
@@ -25,7 +25,8 @@ CREATE TABLE bookings(
     berth_no INTEGER NOT NULL,
     berth_type VARCHAR NOT NULL,
     pnr INTEGER NOT NULL,
-    pname VARCHAR NOT NULL
+    pname VARCHAR NOT NULL,
+    isDone INTEGER 
 );
 
 CREATE TABLE passengers(

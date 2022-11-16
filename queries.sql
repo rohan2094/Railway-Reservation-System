@@ -17,3 +17,4 @@ call book_ticket(1232, '12-14-2002', 'SL', 'Raghav', 2, 10, 10);
 call book_ticket(1232, '12-14-2002', 'AC', 'Shyam', 2, 10, 10);
 call book_ticket(1232, '12-14-2002', 'SL', 'Vijay', 2, 10, 10);
 call book_ticket(1232, '12-14-2002', 'SL', 'Rohan', 2, 10, 10);
+call book_ticket(6909, '2023-01-11', 'SL', 'Janmeet', 32, 10);

@@ -25,80 +25,21 @@ CREATE OR REPLACE PROCEDURE add_train(train_id INTEGER, dated VARCHAR, ac_coache
     $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE  PROCEDURE check_availability(train_id INTEGER, dated VARCHAR, coach_type VARCHAR, tot_passenger INT, INOUT return_val INTEGER)
+CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_type VARCHAR, passenger_name VARCHAR, pnr INTEGER, tot_passenger INTEGER)
     AS $$
     DECLARE
         query1_trains VARCHAR;
         query2_seats VARCHAR;
         no_of_trains INTEGER;
         no_of_seats INTEGER;
-    BEGIN
-        query1_trains = CONCAT('SELECT COUNT(*) FROM trains WHERE train_id = ', train_id, ' AND dated = ''', dated, '''');
-        EXECUTE query1_trains INTO no_of_trains;
-        IF(no_of_trains = 0) THEN return_val = -1; return;
-        END IF;
-
-        no_of_seats = 0 ;
-        IF(coach_type = 'AC') THEN
-            query2_seats = CONCAT('SELECT SUM(total_ac_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
-            EXECUTE query2_seats INTO  no_of_seats ;
-        ELSE 
-            query2_seats = CONCAT('SELECT SUM(total_sl_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
-            EXECUTE query2_seats INTO  no_of_seats ;
-        END IF;
-            IF(tot_passenger <= no_of_seats) THEN
-                return_val= no_of_seats ;
-                return;
-            ELSE
-                return_val = 0;
-                return;
-            END IF;
-    END
-    $$
-LANGUAGE plpgsql;
-
-CREATE OR REPLACE  PROCEDURE update_availability(train_id INTEGER, dated VARCHAR, coach_type VARCHAR, tot_passenger INT, INOUT return_val INTEGER)
-    AS $$
-    DECLARE
-        query_for_lock VARCHAR;
-        query_for_av_seats VARCHAR;
-        no_of_seats INTEGER ;
-        update_query VARCHAR;
-        update_attr VARCHAR;
-        new_value INTEGER ;
-    BEGIN
-        query_for_lock = 'SET ISOLATION';
-        no_of_seats = 0 ;
-        update_attr = CONCAT('total_', coach_type, '_seats');
-        execute query_for_lock;
-        IF(coach_type = 'AC') THEN
-            query_for_av_seats = CONCAT('SELECT SUM(total_ac_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
-            EXECUTE query_for_av_seats INTO  no_of_seats ;
-        ELSE 
-            query_for_av_seats = CONCAT('SELECT SUM(total_sl_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
-            EXECUTE query_for_av_seats INTO  no_of_seats ;
-        END IF;
-        IF(tot_passenger <= no_of_seats) THEN
-            new_value = no_of_seats - tot_passenger;
-            update_query = CONCAT('UPDATE trains SET ', update_attr, ' = ', new_value, ' WHERE train_id = ', train_id , ' AND dated = ''', dated, '''');
-            EXECUTE update_query;
-            return_val = 1 ;
-            return;
-        ELSE
-            return_val = 0;
-            return;
-        END IF ;
-    END
-    $$
-LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_type VARCHAR, passenger_name VARCHAR, pnr INTEGER, total_ac_coach INTEGER, total_sl_coach INTEGER)
-    AS
-    $$
-    DECLARE
+        query_to_update VARCHAR;
+        query_for_ac_coach VARCHAR;
+        query_for_sl_coach VARCHAR;
+        total_ac_coach INTEGER;
+        total_sl_coach INTEGER;
         current_coach INTEGER;
         table_name VARCHAR;
+        update_attr VARCHAR;
         current_coach_seats INTEGER;
         query_for_seats VARCHAR;
         query_avail VARCHAR;
@@ -113,14 +54,41 @@ CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_t
         insert_query VARCHAR;
         insert_query2 VARCHAR;
     BEGIN
+        update_attr = CONCAT('total_', coach_type, '_seats');
+        query_for_ac_coach = CONCAT('SELECT total_ac_coach FROM trains WHERE train_id = ', train_id , ' AND dated = ''', dated, '''');
+        query_for_sl_coach = CONCAT('SELECT total_sl_coach FROM trains WHERE train_id = ', train_id , ' AND dated = ''', dated, '''');
+        execute query_for_ac_coach into total_ac_coach; 
+        execute query_for_sl_coach into total_sl_coach; 
         table_name = CONCAT('for', coach_type);
-        raise notice ' table name is %', table_name ;
-        IF (coach_type = 'AC') THEN
+        query1_trains = CONCAT('SELECT COUNT(*) FROM trains WHERE train_id = ', train_id, ' AND dated = ''', dated, '''');
+        no_of_seats = 0 ;
+        EXECUTE query1_trains INTO no_of_trains;
+        IF(no_of_trains = 0) THEN 
+            raise notice 'No-of_trains : %', no_of_trains;
+            insert_query = CONCAT('INSERT INTO bookings(train_id, dated, coach_id, coach_type, berth_no, berth_type, pnr, pname, isDone) VALUES(', train_id, ',''', dated, ''',', '0' , ',''' ,coach_type,''',' , 0, ',''' ,'NA', ''', ', pnr, ',''' ,passenger_name, ''',0)');
+            EXECUTE insert_query;
+            return;
+        ELSE IF(coach_type = 'AC') THEN
+                query2_seats = CONCAT('SELECT SUM(total_ac_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
+                EXECUTE query2_seats INTO  no_of_seats ;
+            ELSE 
+                query2_seats = CONCAT('SELECT SUM(total_sl_seats) FROM trains WHERE train_id =', train_id ,' AND dated =''' ,dated, '''');
+                EXECUTE query2_seats INTO  no_of_seats ;
+            END IF;
+        END IF;
+        raise notice 'No-of_seats : %', no_of_seats;
+        IF(tot_passenger > no_of_seats) THEN
+            insert_query = CONCAT('INSERT INTO bookings(train_id, dated, coach_id, coach_type, berth_no, berth_type, pnr, pname, isDone) VALUES(', train_id, ',''', dated, ''',', '0' , ',''' ,coach_type,''',' , 0, ',''' ,'NA', ''', ', pnr, ',''' ,passenger_name, ''',0)');
+            EXECUTE insert_query;
+            return ;
+        END IF;
+    
+        IF (coach_type = 'AC') THENdfv 
                 total_coaches = total_ac_coach ;
                 total_berth = 18;
         ELSE 
-                 total_coaches = total_sl_coach ;
-                 total_berth = 24;
+                total_coaches = total_sl_coach ;
+                total_berth = 24;
         END IF ;
         current_coach = 1;
         LOOP
@@ -151,13 +119,15 @@ CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_t
                         alloted_berth_id = current_berth ;
                         query_for_type = CONCAT('SELECT berth_type FROM ', table_name, ' WHERE berth_id = ', alloted_berth_id);
                         EXECUTE query_for_type INTO alloted_berth_type;
-                        insert_query = CONCAT('INSERT INTO bookings(train_id, dated, coach_id, coach_type, berth_no, berth_type, pnr, pname) VALUES(', train_id, ',''', dated, ''',', current_coach , ',''' ,coach_type,''',' , current_berth, ',''' ,alloted_berth_type, ''', ', pnr, ',''' ,passenger_name, ''')');
-                        EXECUTE insert_query ;
+                        insert_query = CONCAT('INSERT INTO bookings(train_id, dated, coach_id, coach_type, berth_no, berth_type, pnr, pname, isDone) VALUES(', train_id, ',''', dated, ''',', current_coach , ',''' ,coach_type,''',' , current_berth, ',''' ,alloted_berth_type, ''', ', pnr, ',''' ,passenger_name, ''',1)');
+                        EXECUTE insert_query;
                         insert_query2 =  CONCAT('INSERT INTO passengers (pnr, pname) VALUES(', pnr, ',''' ,passenger_name , ''')');
-                        EXECUTE insert_query2 ;
+                        EXECUTE insert_query2;
+                        query_to_update = CONCAT('UPDATE trains SET ', update_attr, ' = ', update_attr, '-1 WHERE train_id = ', train_id , ' AND dated = ''', dated, '''');
+                        EXECUTE query_to_update;
                         return;
                 END LOOP;
         END LOOP;
-    END;
+    END
     $$
 LANGUAGE plpgsql;

@@ -42,7 +42,6 @@ public class addtotrain {
                 // }
                 if(lyn.length==1) break;
                 try {
-
                     PreparedStatement stmt = connection.prepareStatement("call add_train(?,?,?,?)");
                     stmt.setInt(1, Integer.parseInt(lyn[0]));
                     stmt.setString(2, lyn[1]);
@@ -50,7 +49,6 @@ public class addtotrain {
                     stmt.setInt(4, Integer.parseInt(lyn[3]));
                     stmt.execute();
                     stmt.close();
-
                 } catch (Exception err) {
                     // System.out.println("An error has occurred.");
                     // System.out.println("See full details below.");
