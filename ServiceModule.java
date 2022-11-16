@@ -58,29 +58,32 @@ class QueryRunner implements Runnable {
                 String[] lyn = clientCommand.split("\\s+");
                 Integer n = lyn.length;
                 Integer tp = Integer.parseInt(lyn[0]);
-                
+                String[] allnames = new String[tp];
+
                 Integer var = tp;
-                for(int i = 0; i < n; i++){
-                    System.out.println(lyn[i]);
-                }
-                System.out.println("\n");
+                
 
                 if(n==1) break;
-
+                System.out.println(var);
                 for(int i=1;i<=var;i++)
                 {
                     String pass_name = lyn[i];
+                    int zzz =pass_name.length();
+                    if(pass_name.charAt(zzz-1)==','){
+                        pass_name = pass_name.substring(0, zzz-1);
+                    }
+                    allnames[i-1]= pass_name;
+                    System.out.println(pass_name);
+                    System.out.println(allnames[i-1]);
+                    System.out.println("\n");
+                }
                     try{
                         CallableStatement ste = connection.prepareCall("CALL book_ticket(?,?,?,?,?,?)");
                                 ste.setInt(1, Integer.parseInt(lyn[n - 3])); // tid
                                 ste.setString(2, lyn[n - 2]); // date
                                 ste.setString(3, lyn[n - 1]); // ct
-                                int zzz =pass_name.length();
-                                if(pass_name.charAt(zzz-1)==','){
-                                    pass_name = pass_name.substring(i, zzz-1);
-                                }
-
-                                ste.setString(4, pass_name); // passanger
+                                Array nm = connection.createArrayOf("varchar", allnames);
+                                ste.setArray(4, nm); // passanger
                                 ste.setInt(5, 123456789); // pnr
                                 ste.setInt(6,tp); // total passanger
                                 ste.execute();
@@ -90,15 +93,14 @@ class QueryRunner implements Runnable {
                         System.out.println("See full details below.");
                         err.printStackTrace();
                     }
-                    tp--;
-                }
+                
 
-                /***************
+                /*****
                  * Your DB code goes here
-                 ****************/
+                 ******/
 
                 // Dummy response send to client
-                responseQuery = "*** Dummy result **";
+                responseQuery = "* Dummy result **";
                 // Sending data back to the client
                 printWriter.println(responseQuery);
                 // Read next client query

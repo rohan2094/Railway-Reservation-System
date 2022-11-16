@@ -25,8 +25,7 @@ CREATE TABLE bookings(
     berth_no INTEGER NOT NULL,
     berth_type VARCHAR NOT NULL,
     pnr INTEGER NOT NULL,
-    pname VARCHAR NOT NULL,
-    isDone INTEGER 
+    pname VARCHAR NOT NULL
 );
 
 CREATE TABLE passengers(

@@ -13,7 +13,10 @@ call check_availability(1232, '12-14-2002', 'SL', 10, 0);
 call check_availability(1232, '12-14-2002', 'SL', 240, 0);
 call check_availability(1232, '12-14-2002', 'SL', 10000, 0);
 
-call book_ticket(1232, '12-14-2002', 'SL', 'Raghav', 2, 10, 10);
+-- CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_type VARCHAR, tot_passenger INTEGER, passList character varying[], pnr INTEGER)
+
+
+call book_ticket(4523, '2023-05-10', 'SL', 7, array['Raghav', 'Rohan', 'Shyam', 'Vijay', 'Janmeet', 'Aakash', 'Sushil'], 24);
 call book_ticket(1232, '12-14-2002', 'AC', 'Shyam', 2, 10, 10);
 call book_ticket(1232, '12-14-2002', 'SL', 'Vijay', 2, 10, 10);
 call book_ticket(1232, '12-14-2002', 'SL', 'Rohan', 2, 10, 10);
