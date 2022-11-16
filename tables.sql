@@ -15,8 +15,6 @@ CREATE TABLE trains(
     total_ac_coach INTEGER NOT NULL,
     total_sl_coach INTEGER NOT NULL
 );
-
-
 CREATE TABLE bookings(
     train_id INTEGER NOT NULL,
     dated VARCHAR NOT NULL,
@@ -27,7 +25,6 @@ CREATE TABLE bookings(
     pnr INTEGER NOT NULL,
     pname VARCHAR NOT NULL
 );
-
 CREATE TABLE passengers(
     pnr INTEGER NOT NULL,
     pname VARCHAR NOT NULL
