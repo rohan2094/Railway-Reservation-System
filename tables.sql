@@ -1,12 +1,25 @@
+-- This is for resetting the entire databse again :
+-- Copy this code in psql server to reset the database entries.
+
+DROP TABLE trains ;
+DROP TABLE bookings ;
+DROP TABLE passengers;
+DROP TABLE forac ;
+DROP TABLE forsl ;
+
+-- For a single AC coach description
 CREATE TABLE forac(
     berth_id INTEGER ,
     berth_type VARCHAR NOT NULL
 );
 
+-- For a single sleeper coach description
 CREATE TABLE forsl(
     berth_id INTEGER NOT NULL,
     berth_type VARCHAR NOT NULL
 );
+
+-- Number of available trains in database comes through this table
 CREATE TABLE trains(
     train_id INTEGER NOT NULL,
     dated VARCHAR(10) NOT NULL,
@@ -15,6 +28,9 @@ CREATE TABLE trains(
     total_ac_coach INTEGER NOT NULL,
     total_sl_coach INTEGER NOT NULL
 );
+
+-- Relation between trains and forac or forsl
+-- This table links the train's seat with a particular passenger
 CREATE TABLE bookings(
     train_id INTEGER NOT NULL,
     dated VARCHAR NOT NULL,
@@ -25,11 +41,14 @@ CREATE TABLE bookings(
     pnr INTEGER NOT NULL,
     pname VARCHAR NOT NULL
 );
+
+-- List of all passengers with their pnr values
 CREATE TABLE passengers(
     pnr INTEGER NOT NULL,
     pname VARCHAR NOT NULL
 );
 
+-- Adding ac coach seats into forac table
 INSERT INTO forAC(berth_id, berth_type) VALUES (1,'LB');
 INSERT INTO forAC(berth_id, berth_type) VALUES (2,'LB');
 INSERT INTO forAC(berth_id, berth_type) VALUES (3,'UB');
@@ -49,6 +68,7 @@ INSERT INTO forAC(berth_id, berth_type) VALUES (16,'UB');
 INSERT INTO forAC(berth_id, berth_type) VALUES (17,'SL');
 INSERT INTO forAC(berth_id, berth_type) VALUES (18,'SU');
 
+-- Adding sl coach seats into forac table
 INSERT INTO forSL(berth_id, berth_type) VALUES (1,'LB');
 INSERT INTO forSL(berth_id, berth_type) VALUES (2,'MB');
 INSERT INTO forSL(berth_id, berth_type) VALUES (3,'UB');

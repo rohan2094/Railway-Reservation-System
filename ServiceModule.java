@@ -86,7 +86,6 @@ class QueryRunner implements Runnable {
                     PreparedStatement stmt = connection
                             .prepareStatement("SELECT * FROM bookings WHERE pnr=" + unique_pnr + ";");
                     ResultSet rs = stmt.executeQuery();
-                    
                     while (rs.next()) {
 
                         for (int i = 1; i <= 8; i++) {
@@ -120,8 +119,8 @@ class QueryRunner implements Runnable {
                                 responseQuery += actualValues;
                             }
                             responseQuery = responseQuery + "\n";
-
                         }
+                        responseQuery += "\n";
                     }
 
                 } catch (Exception err) {

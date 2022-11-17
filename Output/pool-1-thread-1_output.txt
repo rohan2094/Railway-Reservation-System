@@ -1,3 +1,19 @@
+Train Name => 6909
+Date => 2023-01-11
+Coach Id => 1
+Coach Type => SL
+Berth number => 1
+Berth Type => LB
+PNR => 30077
+Passanger Name => ELWN
 
+Train Name => 6909
+Date => 2023-01-11
+Coach Id => 1
+Coach Type => SL
+Berth number => 2
+Berth Type => MB
+PNR => 30077
+Passanger Name => PUAL
 
 

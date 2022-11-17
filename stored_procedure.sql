@@ -1,3 +1,4 @@
+-- add_train function to add train to the database
 CREATE OR REPLACE PROCEDURE add_train(train_id INTEGER, dated VARCHAR, ac_coaches INTEGER, sl_coaches INTEGER)
     AS
     $$
@@ -16,6 +17,7 @@ CREATE OR REPLACE PROCEDURE add_train(train_id INTEGER, dated VARCHAR, ac_coache
         ss = 0 ;
         condition_check  = CONCAT('SELECT COUNT(*) FROM trains WHERE train_id = ', train_id, ' AND dated = ''',  dated, '''');
         EXECUTE condition_check INTO checker ;
+        -- Adding train only if there is no other train with same id and same date
         if(checker = 0) THEN 
             in_query = CONCAT('INSERT INTO trains(train_id, dated, total_ac_seats, total_sl_seats, total_ac_coach, total_sl_coach) VALUES (', train_id , ', ''' , dated, ''',', ac_seats, ',' , sl_seats, ',' , ac_coaches, ',', sl_coaches ,')');
             execute (in_query);
@@ -25,6 +27,7 @@ CREATE OR REPLACE PROCEDURE add_train(train_id INTEGER, dated VARCHAR, ac_coache
     $$
 LANGUAGE plpgsql;
 
+-- Stored procedure for booking a ticket
 CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_type VARCHAR, passList character varying[], pnr INTEGER, tot_passenger INTEGER)
     AS $$
     DECLARE
@@ -81,9 +84,9 @@ CREATE OR REPLACE PROCEDURE book_ticket(train_id INTEGER, dated VARCHAR, coach_t
 
         IF(tot_passenger > no_of_seats) THEN
             return ;
-        -- Neeche wali transiction pe lock karna kisi tarah se dekhte hai baad me
         ELSE
             query_to_update = CONCAT('UPDATE trains SET ', update_attr, ' = ', update_attr, '-', tot_passenger , ' WHERE train_id = ', train_id , ' AND dated = ''', dated, '''');
+            raise notice '%', query_to_update ;
             EXECUTE query_to_update;
         END IF;
     
