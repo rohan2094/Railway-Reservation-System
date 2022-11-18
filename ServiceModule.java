@@ -86,8 +86,9 @@ class QueryRunner implements Runnable {
                     PreparedStatement stmt = connection
                             .prepareStatement("SELECT * FROM bookings WHERE pnr=" + unique_pnr + ";");
                     ResultSet rs = stmt.executeQuery();
-                    while (rs.next()) {
-
+                    if(!rs.next()){
+                        responseQuery = "Not booked user !!\n";
+                    }else{    
                         for (int i = 1; i <= 8; i++) {
                             if (i == 1) {
                                 responseQuery += "Train Name =>";
@@ -120,8 +121,43 @@ class QueryRunner implements Runnable {
                             }
                             responseQuery = responseQuery + "\n";
                         }
-                        responseQuery += "\n";
-                    }
+                        responseQuery += "\n"; 
+                        while (rs.next()) {
+                            for (int i = 1; i <= 8; i++) {
+                                if (i == 1) {
+                                    responseQuery += "Train Name =>";
+                                }
+                                if (i == 2) {
+                                    responseQuery += "Date =>";
+                                }
+                                if (i == 3) {
+                                    responseQuery += "Coach Id =>";
+                                }
+                                if (i == 4) {
+                                    responseQuery += "Coach Type =>";
+                                }
+                                if (i == 5) {
+                                    responseQuery += "Berth number =>";
+                                }
+                                if (i == 6) {
+                                    responseQuery += "Berth Type =>";
+                                }
+                                if (i == 7) {
+                                    responseQuery += "PNR =>";
+                                }
+                                if (i == 8) {
+                                    responseQuery += "Passanger Name =>";
+                                }
+                                if (i > 0) {
+                                    responseQuery = responseQuery + " ";
+                                    String actualValues = rs.getString(i);
+                                    responseQuery += actualValues;
+                                }
+                                responseQuery = responseQuery + "\n";
+                            }
+                            responseQuery += "\n";
+                        }
+                }
 
                 } catch (Exception err) {
                     System.out.println("An error has occurred.");
