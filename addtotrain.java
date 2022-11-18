@@ -14,7 +14,7 @@ public class addtotrain {
 
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5433/db", "postgres", "1234");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/db", "postgres", "1234");
             if (connection != null) {
                 System.out.println("connection OK");
             } else {
